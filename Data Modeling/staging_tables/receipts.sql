@@ -25,3 +25,25 @@ SELECT
     (data->>'totalSpent')::DECIMAL AS total_spent,
     data->>'userId' AS user_id
 FROM receipts_raw_json;
+
+INSERT INTO receipts (
+    oid, bonus_points_earned, bonus_points_earned_reason, create_date, date_scanned, 
+    finished_date, modify_date, points_awarded_date, points_earned, purchase_date, 
+    purchased_item_count, rewards_receipt_status, total_spent, user_id
+)
+SELECT 
+    data->'_id'->>'$oid' AS oid,
+    (data->>'bonusPointsEarned')::INT AS bonus_points_earned,
+    data->>'bonusPointsEarnedReason' AS bonus_points_earned_reason,
+    to_timestamp((data->'createDate'->>'$date')::BIGINT / 1000) AS create_date,
+    to_timestamp((data->'dateScanned'->>'$date')::BIGINT / 1000) AS date_scanned,
+    to_timestamp((data->'finishedDate'->>'$date')::BIGINT / 1000) AS finished_date,
+    to_timestamp((data->'modifyDate'->>'$date')::BIGINT / 1000) AS modify_date,
+    to_timestamp((data->'pointsAwardedDate'->>'$date')::BIGINT / 1000) AS points_awarded_date,
+    (data->>'pointsEarned')::DECIMAL AS points_earned,
+    to_timestamp((data->'purchaseDate'->>'$date')::BIGINT / 1000) AS purchase_date,
+    (data->>'purchasedItemCount')::INT AS purchased_item_count,
+    data->>'rewardsReceiptStatus' AS rewards_receipt_status,
+    (data->>'totalSpent')::DECIMAL AS total_spent,
+    data->>'userId' AS user_id
+FROM raw_json;
