@@ -19,4 +19,19 @@ FROM json_data;
 
 ALTER TABLE brands ADD PRIMARY KEY (id);
 
+INSERT INTO brands (id, active, created_date, last_login, role, sign_up_source, state)
+WITH json_data AS (
+    SELECT jsonb_array_elements(data) AS json_obj
+    FROM brands
+)
+SELECT 
+    json_obj -> '_id' ->> '$oid' AS id,
+    (json_obj -> 'active')::text AS active,
+    TO_TIMESTAMP((json_obj -> 'createdDate' ->> '$date')::bigint / 1000) AS created_date,
+    TO_TIMESTAMP((json_obj -> 'lastLogin' ->> '$date')::bigint / 1000) AS last_login,
+    (json_obj ->> 'role')::text AS role,
+    (json_obj ->> 'signUpSource')::text AS sign_up_source,
+    (json_obj ->> 'state')::text AS state
+FROM json_data;
+
 
