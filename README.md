@@ -1,11 +1,7 @@
 # Fetch-Assessment
 This repository contains my full blown solution for the Fetch Analytics Engineer assessment.
 
-Great! Here is a polished version suitable for a GitHub README:
-
----
-
-## Approach for Fetch Coding Analytics Assessment
+## Approach
 
 ### Environment Setup
 - Configured a PostgreSQL database using Docker.
