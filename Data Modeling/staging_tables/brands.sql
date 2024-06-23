@@ -8,30 +8,31 @@ WITH json_data AS (
     FROM raw_json
 )
 SELECT 
-    json_obj -> '_id' ->> '$oid' AS id,
-    (json_obj -> 'active')::text AS active,
-    TO_TIMESTAMP((json_obj -> 'createdDate' ->> '$date')::bigint / 1000) AS created_date,
-    TO_TIMESTAMP((json_obj -> 'lastLogin' ->> '$date')::bigint / 1000) AS last_login,
-    (json_obj ->> 'role')::text AS role,
-    (json_obj ->> 'signUpSource')::text AS sign_up_source,
-    (json_obj ->> 'state')::text AS state
+   data->'_id'->>'$oid' AS brand_uuid,
+    data->>'barcode' AS barcode,
+    data->>'category' AS category,
+    data->>'categoryCode' AS category_code,
+    data->'cpg'->>'$id' AS cpg_oid,
+    data->'cpg'->>'$ref' AS cpg_ref,
+    data->>'name' AS name,
+    (data->>'topBrand')::BOOLEAN AS top_brand,
+    data->>'brandCode' AS brand_code
 FROM json_data;
 
 ALTER TABLE brands ADD PRIMARY KEY (id);
 
-INSERT INTO brands (id, active, created_date, last_login, role, sign_up_source, state)
-WITH json_data AS (
-    SELECT jsonb_array_elements(data) AS json_obj
-    FROM brands
-)
+INSERT INTO brands (brand_uuid, barcode, category, category_code, cpg_oid, cpg_ref, name, top_brand, brand_code)
 SELECT 
-    json_obj -> '_id' ->> '$oid' AS id,
-    (json_obj -> 'active')::text AS active,
-    TO_TIMESTAMP((json_obj -> 'createdDate' ->> '$date')::bigint / 1000) AS created_date,
-    TO_TIMESTAMP((json_obj -> 'lastLogin' ->> '$date')::bigint / 1000) AS last_login,
-    (json_obj ->> 'role')::text AS role,
-    (json_obj ->> 'signUpSource')::text AS sign_up_source,
-    (json_obj ->> 'state')::text AS state
-FROM json_data;
+    data->'_id'->>'$oid' AS brand_uuid,
+    data->>'barcode' AS barcode,
+    data->>'category' AS category,
+    data->>'categoryCode' AS category_code,
+    data->'cpg'->'$id'->>'$oid' AS cpg_oid,
+    data->'cpg'->>'$ref' AS cpg_ref,
+    data->>'name' AS name,
+    (data->>'topBrand')::BOOLEAN AS top_brand,
+    data->>'brandCode' AS brand_code
+FROM raw_json;
+
 
 
